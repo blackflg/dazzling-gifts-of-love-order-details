@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form - Dazzling Gifts of Love</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, textarea, button, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+        .delivery-note, .confirmation-note, .delivery-charge-note {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dazzling Gifts of Love</h1>
+        <h2>Order Details</h2>
+        <div class="delivery-note">
+            <strong>Delivery Time:</strong> Your order will be delivered within 10 to 14 working days.
+        </div>
+        <div class="confirmation-note">
+            <strong>Note:</strong> Your order will be confirmed and processed only after payment verification.
+        </div>
+        <div class="delivery-charge-note">
+            <strong>Delivery Charge:</strong> We use a 3rd party delivery partner. Please check the delivery status with them after dispatch.
+        </div>
+        <form id="orderForm">
+            <label for="name">1. Name:</label>
+            <input type="text" id="name" name="name" required>
+            <div id="nameError" class="error"></div>
+
+            <label for="address">2. Delivery Address:</label>
+            <textarea id="address" name="address" rows="3" required></textarea>
+            <div id="addressError" class="error"></div>
+
+            <label for="orderCode">3. Order Confirmation Code:</label>
+            <input type="text" id="orderCode" name="orderCode" required>
+            <div id="orderCodeError" class="error"></div>
+
+            <label for="phone1">4. Phone Number 1:</label>
+            <input type="tel" id="phone1" name="phone1" required>
+            <div id="phone1Error" class="error"></div>
+
+            <label for="phone2">5. Phone Number 2 (Optional):</label>
+            <input type="tel" id="phone2" name="phone2">
+            <div id="phone2Error" class="error"></div>
+
+            <label for="product">6. Product:</label>
+            <input type="text" id="product" name="product" required>
+            <div id="productError" class="error"></div>
+
+            <label for="quantity">7. Quantity:</label>
+            <input type="number" id="quantity" name="quantity" required>
+            <div id="quantityError" class="error"></div>
+
+            <label for="customization">8. Customization Details:</label>
+            <textarea id="customization" name="customization" rows="4"></textarea>
+
+            <label for="deliveryCharge">9. Delivery Charge Payment Option:</label>
+            <select id="deliveryCharge" name="deliveryCharge" required>
+                <option value="" disabled selected>Select an option</option>
+                <option value="pay_to_delivery_company">I'll pay the delivery charge directly to the delivery company.</option>
+                <option value="pay_to_you">I'll pay the delivery charge to you.</option>
+            </select>
+            <div id="deliveryChargeError" class="error"></div>
+
+            <label for="totalAmount">10. Total Payment Amount:</label>
+            <input type="number" id="totalAmount" name="totalAmount" required>
+            <div id="totalAmountError" class="error"></div>
+
+            <button type="button" onclick="validateAndGeneratePDF()">Download Receipt</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        function validateAndGeneratePDF() {
+            let isValid = true;
+
+            const name = document.getElementById('name').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const orderCode = document.getElementById('orderCode').value.trim();
+            const phone1 = document.getElementById('phone1').value.trim();
+            const phone2 = document.getElementById('phone2').value.trim();
+            const product = document.getElementById('product').value.trim();
+            const quantity = document.getElementById('quantity').value.trim();
+            const deliveryCharge = document.getElementById('deliveryCharge').value;
+            const totalAmount = document.getElementById('totalAmount').value.trim();
+
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Name is required.';
+                isValid = false;
+            } else {
+                document.getElementById('nameError').textContent = '';
+            }
+
+            if (!address) {
+                document.getElementById('addressError').textContent = 'Delivery Address is required.';
+                isValid = false;
+            } else {
+                document.getElementById('addressError').textContent = '';
+            }
+
+            if (!orderCode) {
+                document.getElementById('orderCodeError').textContent = 'Order Confirmation Code is required.';
+                isValid = false;
+            } else {
+                document.getElementById('orderCodeError').textContent = '';
+            }
+
+            if (!phone1) {
+                document.getElementById('phone1Error').textContent = 'Phone Number 1 is required.';
+                isValid = false;
+            } else {
+                document.getElementById('phone1Error').textContent = '';
+            }
+
+            if (!product) {
+                document.getElementById('productError').textContent = 'Product is required.';
+                isValid = false;
+            } else {
+                document.getElementById('productError').textContent = '';
+            }
+
+            if (!quantity) {
+                document.getElementById('quantityError').textContent = 'Quantity is required.';
+                isValid = false;
+            } else {
+                document.getElementById('quantityError').textContent = '';
+            }
+
+            if (!deliveryCharge) {
+                document.getElementById('deliveryChargeError').textContent = 'Delivery charge payment option is required.';
+                isValid = false;
+            } else {
+                document.getElementById('deliveryChargeError').textContent = '';
+            }
+
+            if (!totalAmount) {
+                document.getElementById('totalAmountError').textContent = 'Total payment amount is required.';
+                isValid = false;
+            } else {
+                document.getElementById('totalAmountError').textContent = '';
+            }
+
+            if (isValid) {
+                generatePDF();
+            }
+        }
+
+        function generatePDF() {
+            const doc = new jsPDF({ format: 'a5' });
+
+            // Add receipt header
+            doc.setFontSize(18);
+            doc.setTextColor(0, 0, 0); // Black text
+            doc.setFont("helvetica", "bold");
+            doc.text("Dazzling Gifts of Love", 10, 15);
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Order Receipt", 10, 25);
+
+            // Add barcode
+            const barcodeText = document.getElementById('orderCode').value;
+            JsBarcode("#barcode", barcodeText, { format: "CODE128", displayValue: false });
+            const barcodeImg = document.getElementById('barcode').src;
+            doc.addImage(barcodeImg, 'PNG', 10, 30, 80, 20);
+
+            // Add order details
+            doc.setFontSize(10);
+            doc.text(`Order Confirmation Code: ${barcodeText}`, 10, 60);
+            doc.text(`Name: ${document.getElementById('name').value}`, 10, 70);
+            doc.text(`Delivery Address: ${document.getElementById('address').value}`, 10, 80);
+            doc.text(`Phone 1: ${document.getElementById('phone1').value}`, 10, 90);
+            doc.text(`Phone 2: ${document.getElementById('phone2').value || "N/A"}`, 10, 100);
+            doc.text(`Product: ${document.getElementById('product').value}`, 10, 110);
+            doc.text(`Quantity: ${document.getElementById('quantity').value}`, 10, 120);
+            doc.text(`Customization: ${document.getElementById('customization').value || "N/A"}`, 10, 130);
+            doc.text(`Delivery Charge Payment: ${document.getElementById('deliveryCharge').value}`, 10, 140);
+            doc.text(`Total Amount: $${document.getElementById('totalAmount').value}`, 10, 150);
+
+            // Add footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100); // Gray text
+            doc.text("Thank you for shopping with us!", 10, 160);
+            doc.text("Please check delivery status with the 3rd party delivery partner after dispatch.", 10, 165);
+
+            // Save the PDF with the Order Confirmation Code as the file name
+            const fileName = `Order_Receipt_${barcodeText}.pdf`;
+            doc.save(fileName);
+        }
+    </script>
+    <img id="barcode" style="display: none;" />
+</body>
+</html>
